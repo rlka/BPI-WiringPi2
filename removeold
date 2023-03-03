@@ -36,8 +36,8 @@ check_make_ok() {
     echo ""
     echo "Make Failed..."
     echo "Please check the messages and fix any problems. If you're still stuck,"
-    echo "then raise a GitHub issue with the output and as many details as you can"
-    echo "  https://github.com/WiringPi/WiringPi/issues"
+    echo "then please email all the output and as many details as you can to"
+    echo "  projects@drogon.net"
     echo ""
     exit 1
   fi
@@ -64,19 +64,16 @@ if [ x$1 = "xclean" ]; then
   echo -n "PiGlow:     "	; make clean
   cd ../scrollPhat
   echo -n "scrollPhat: "	; make clean
-  cd ../..
-  echo -n "Deb: " ; rm  -f debian-template/wiringpi*.deb
-  echo
   exit
 fi
 
 if [ x$1 = "xuninstall" ]; then
   cd wiringPi
-  echo -n "wiringPi: " ; $sudo make uninstall
+  echo -n "wiringPi: " ; $sudo make PREFIX=/ uninstall
   cd ../devLib
-  echo -n "DevLib:   " ; $sudo make uninstall
+  echo -n "DevLib:   " ; $sudo make PREFIX=/ uninstall
   cd ../gpio
-  echo -n "gpio:     " ; $sudo make uninstall
+  echo -n "gpio:     " ; $sudo make PREFIX=/ uninstall
   exit
 fi
 
@@ -84,15 +81,14 @@ fi
 
 if [ x$1 = "xdebian" ]; then
   here=`pwd`
-  deb_destdir=${here}/debian-template/wiringPi
   cd debian-template/wiringPi
   rm -rf usr
   cd $here/wiringPi
-  make install-deb DEB_DESTDIR=${deb_destdir}
+  make install-deb
   cd $here/devLib
-  make install-deb INCLUDE='-I. -I../wiringPi' DEB_DESTDIR=${deb_destdir}
+  make install-deb INCLUDE='-I. -I../wiringPi'
   cd $here/gpio
-  make install-deb INCLUDE='-I../wiringPi -I../devLib' LDFLAGS=-L../debian-template/wiringPi/usr/lib DEB_DESTDIR=${deb_destdir}
+  make install-deb INCLUDE='-I../wiringPi -I../devLib' LDFLAGS=-L../debian-template/wiringPi/usr/lib
   cd $here/debian-template
   fakeroot dpkg-deb --build wiringPi
   mv wiringPi.deb  wiringpi-`cat $here/VERSION`-1.deb
@@ -109,6 +105,22 @@ fi
   echo
 
   hardware=`fgrep Hardware /proc/cpuinfo | head -1 | awk '{ print $3 }'`
+
+#  if [ x$hardware != "xBCM2708" ]; then
+#    echo ""
+#    echo "   +------------------------------------------------------------+"
+#    echo "   |   wiringPi is designed to run on the Raspberry Pi only.    |"
+#    echo "   |   This processor does not appear to be a Raspberry Pi.     |"
+#    echo "   +------------------------------------------------------------+"
+#    echo "   | In the unlikely event that you think it is a Raspberry Pi, |"
+#    echo "   | then please accept my apologies and email the contents of  |"
+#    echo "   | /proc/cpuinfo to projects@drogon.net.                      |"
+#    echo "   |    - Thanks, Gordon                                        |"
+#    echo "   +------------------------------------------------------------+"
+#    echo ""
+#    exit 1
+#  fi
+
 
   echo
   echo "WiringPi Library"

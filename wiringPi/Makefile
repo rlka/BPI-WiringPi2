@@ -37,7 +37,7 @@ DYNAMIC=libwiringPi.so.$(VERSION)
 #DEBUG	= -g -O0
 DEBUG	= -O2
 CC	?= gcc
-INCLUDE	= -I.
+INCLUDE	= -I. -I./board
 DEFS	= -D_GNU_SOURCE
 CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Winline $(INCLUDE) -pipe -fPIC $(EXTRA_CFLAGS)
 #CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Wconversion -Winline $(INCLUDE) -pipe -fPIC
@@ -47,6 +47,7 @@ LIBS    = -lm -lpthread -lrt -lcrypt
 ###############################################################################
 
 SRC	=	wiringPi.c						\
+		wiringPi_bpi.c						\
 		wiringSerial.c wiringShift.c				\
 		piHiPri.c piThread.c					\
 		wiringPiSPI.c wiringPiI2C.c				\
@@ -70,7 +71,7 @@ OBJ	=	$(SRC:.c=.o)
 all:		$(DYNAMIC)
 
 .PHONY:	static
-static:	
+static:
 		$Q cat noMoreStatic
 
 $(DYNAMIC):	$(OBJ)
